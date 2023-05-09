@@ -6,78 +6,80 @@
 
 <%@page language="java" contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.*" %>
+<%@include file="navbar.jsp" %>
+<%@include file="footer.jsp" %>
 <%@page import="gestion.*" %>
 <% 
      GestionEleve ge = new GestionEleve();
-     List<Eleve> liste  = ge.all();
+     String code = request.getParameter("code");
+     Eleve eleve = ge.find(code);
+     List<Eleve> liste = new ArrayList<Eleve>();
+     if(eleve==null){
+        liste  = ge.all();
+        System.out.println("Liste de recherche null");
+    }
+    else{
+        liste.add(eleve);
+    }
 %>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Gestion eleve</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <style>
-            
+            /* Style pour la boîte de dialogue */
+            .confirm-dialog {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
         </style>
     </head>
     <body>
     <center>
-        <div class="card ">
-            <div class="card-header font-weight-bold">
-                   Liste des eleves
+        <div class="card col-md-10 mt-5">
+            <div class="card-header bg-primary">
+                Liste des eleves
             </div>
-              <div class="row justify-content-between">
-                    <div class="col-md-2">
-                      <a href="form_add.jsp" class="btn btn-outline-primary mt-3">Ajouter eleve</a>
-                    </div>
-                    <div class="col-md-4">
-                      <form action="form_update.jsp" method="GET" class="form-inline">
-                        <div class="form-group  mt-3">
-                            <input type="text" name="code_upd"  class="form-control" placeholder="Code eleve">
-                        </div>
-                        <button type="submit" class="btn btn-outline-success mt-3">Modifier eleve</button>
-                      </form>
-                    </div>
-                    <div class="col-md-4">
-                      <form action="delete.jsp" method="GET" class="form-inline">
-                        <div class="form-group mt-3">
-                          
-                            <input type="text" name="code_supp" class="form-control" placeholder="Code eleve">
-                        </div>
-                        <button type="submit" class="btn btn-outline-danger mt-3">Supprimer eleve</button>
-                      </form>
-                    </div>
-                    
-              </div>
             <div class="card-body">
-        <table class="table table-striped table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th scope="col" class="text-center">Code eleve</th>
-                <th scope="col" class="text-center">Nom</th>
-                <th scope="col" class="text-center">Prenom</th>
-                <th scope="col" class="text-center">Niveau</th>
-                <th scope="col" class="text-center">Filiere</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% for(Eleve e : liste){ %>
-              <tr>
-                <td class="text-center"><%=e.getCode() %></td>
-                <td><%=e.getNom() %></td>
-                <td><%=e.getPrenom() %></td>
-                <td class="text-center"><%=e.getNiveau() %></td>
-                <td class="text-center"><%=e.getCode_fil() %></td>
-              </tr>
-              <% } %>
-            </tbody>
-        </table>
+                <form action="index.jsp" method="post" class="form-inline mb-3">
+                    <div class="form-group">
+                        <input type="text" name="code" class="form-control" placeholder="Rechercher avec le code...">
+                    </div>
+                    <button type="submit" class="btn btn-primary ">Rechercher</button>
+                </form>
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col" class="text-center">Code eleve</th>
+                            <th scope="col" class="text-center">Nom</th>
+                            <th scope="col" class="text-center">Prenom</th>
+                            <th scope="col" class="text-center">Niveau</th>
+                            <th scope="col" class="text-center">Filiere</th>
+                            <th scope="col" class="text-center" colspan="2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(Eleve e : liste){ %>
+                        <tr>
+                            <td class="text-center"><%=e.getCode() %></td>
+                            <td><%=e.getNom() %></td>
+                            <td><%=e.getPrenom() %></td>
+                            <td class="text-center"><%=e.getNiveau() %></td>
+                            <td class="text-center"><%=e.getCode_fil() %></td>
+                            <td class="text-center">
+                                <a href="form_update.jsp?code_upd=<%=e.getCode() %>" class="btn btn-sm btn-primary"><i class="bi bi-pencil"></i> </a>
+                            </td>
+                            <td class="text-center">
+                                <a onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')" href="delete.jsp?code_supp=<%=e.getCode() %>" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>                                <% } %>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="card-footer  font-weight-bold">
-                Ecole Nationnale des Sciences Appliquées de Tanger
-        </div>
-       </div>
     </center>
-    </body>
+</body>
 </html>
